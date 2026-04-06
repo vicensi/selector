@@ -8,7 +8,7 @@ def load_data(transactions_path, customers_path):
 
     # Tratamento
     df_transactions['timestamp'] = pd.to_datetime(df_transactions['timestamp'])
-    df_transactions['data'] = transaction['timestamp'].dt.strftime('%d-%m-%Y')
+    df_transactions['data'] = df_transactions['timestamp'].dt.strftime('%d-%m-%Y')
 
     df_transactions['fraud_confirmed'] = df_transactions['fraud_confirmed'].fillna(2)
 
