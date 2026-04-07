@@ -31,7 +31,7 @@ def apply_filters(df, date_range, selected_channels=None):
     df = df.dropna(subset=['timestamp'])
 
     # =========================
-    # 📅 Ajuste correto de datas
+    # 📅 datas
     # =========================
     if len(date_range) == 2:
         start_date = pd.to_datetime(date_range[0])
