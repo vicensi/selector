@@ -35,36 +35,41 @@ st.subheader("🔎 Filtros")
 
 col1, col2 = st.columns(2)
 
-min_date = df['timestamp'].min()
-max_date = df['timestamp'].max()
+# Garantir tipo correto
+df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+
+min_date = df['timestamp'].min().date()
+max_date = df['timestamp'].max().date()
 
 with col1:
-    date_range = st.date_input("Período", [min_date, max_date])
+    date_range = st.date_input(
+        "Período",
+        value=[min_date, max_date]
+    )
 
 with col2:
     if 'channel' in df.columns:
-        channel = df['channel'].dropna().unique()
-        selected_devices = st.multiselect(
+        channel = sorted(df['channel'].dropna().unique())
+        selected_channels = st.multiselect(
             "Canal / Device",
             options=channel,
             default=channel
         )
     else:
-        st.warning("Coluna 'device' não encontrada")
-        selected_devices = None
+        st.warning("Coluna 'channel' não encontrada")
+        selected_channels = None
 
-# =========================
-# 📊 PROCESSAMENTO
-# =========================
+# PROCESSAMENTO
+
 df_filtered = apply_filters(df, date_range, selected_devices)
 
 total_volume, total_amount, fraud_rate = calculate_kpis(df_filtered)
 
 
 
-# =========================
-# 📊 KPIs
-# =========================
+
+# KPIs
+
 col1, col2, col3 = st.columns(3)
 
 col1.metric("🔢 Volume Total", f"{total_volume:,}")
