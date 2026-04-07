@@ -127,7 +127,7 @@ def fraud_rate_by_transaction_type(df_filtered):
     # Calcular total de transações e fraudes por tipo
     fraud_by_type = df_filtered.groupby('transaction_type').agg(
         total_transacoes=('transaction_id', 'count'),
-        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum()
+        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum())
     ).reset_index()
 
     # Calcular taxa de fraude %
@@ -168,7 +168,7 @@ def fraud_rate_by_merchant_category(df_filtered):
     # Calcular total de transações e fraudes por categoria
     fraud_by_category = df_filtered.groupby('merchant_category').agg(
         total_transacoes=('transaction_id', 'count'),
-        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum()
+        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum())
     ).reset_index()
 
     # Calcular taxa de fraude %
@@ -221,7 +221,7 @@ def transaction_fraud_trend(df_filtered):
     # =========================
     trend_data = df_filtered.groupby('data_so').agg(
         total_transacoes=('transaction_id', 'count'),
-        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum()
+        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum())
     ).reset_index()
 
     trend_data = trend_data.sort_values('data_so')
@@ -312,7 +312,7 @@ def fraud_rate_trend(df_filtered):
     # =========================
     trend_data = df_filtered.groupby('data_so').agg(
         total_transacoes=('transaction_id', 'count'),
-        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum()
+        fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum())
     ).reset_index()
 
     # Calcular taxa de fraude (%)
