@@ -87,7 +87,7 @@ st.divider()
 # Divisão em abas para não poluir a tela
 # =========================
 
-st.title("Dashboard")
+st.subheader("Visão")
 tab1, tab2, tab3, tab4 = st.tabs(["📈 Visão geral", "📊 Análise de Risco", "Transações e Categoria", "📋 Dados Transacionais"])
 
 
