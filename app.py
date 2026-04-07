@@ -62,7 +62,7 @@ with col2:
 
 # PROCESSAMENTO
 
-df_filtered = apply_filters(df, date_range, selected_devices)
+df_filtered = apply_filters(df, date_range, selected_channels)
 
 total_volume, total_amount, fraud_rate = calculate_kpis(df_filtered)
 
