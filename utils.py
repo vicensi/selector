@@ -132,6 +132,65 @@ def top_risk_barchart(df_filtered, top_n=10):
     chart = chart.properties(width=400, height=450)
     
     return chart
+
+
+# Série temporal do valor total (amount) por dia, segmentado por status de fraude.
+def timechart_amount_by_fraud(df_filtered):
+
+
+    df_filtered = df_filtered.copy()
+
+    # =========================
+    # 🧼 Preparação
+    # =========================
+    df_filtered['timestamp'] = pd.to_datetime(df_filtered['timestamp'], errors='coerce')
+    df_filtered = df_filtered.dropna(subset=['timestamp'])
+
+    df_filtered['fraud_confirmed'] = df_filtered['fraud_confirmed'].fillna(2)
+
+    # =========================
+    # 📊 Agregação diária
+    # =========================
+    df_daily = df_filtered.groupby(
+        [pd.Grouper(key='timestamp', freq='D'), 'fraud_confirmed']
+    )['amount'].sum().reset_index()
+
+    # =========================
+    # 🎯 Mapeamento de labels
+    # =========================
+    df_daily['status'] = df_daily['fraud_confirmed'].map({
+        0: 'Não Fraude',
+        1: 'Fraude',
+        2: 'Desconhecido'
+    })
+
+    # =========================
+    # 📈 Gráfico
+    # =========================
+    chart = alt.Chart(df_daily).mark_line(point=True).encode(
+        x=alt.X('timestamp:T', title='Data'),
+        y=alt.Y('amount:Q', title='Valor Total (Amount)'),
+        color=alt.Color(
+            'status:N',
+            scale=alt.Scale(
+                domain=['Não Fraude', 'Fraude', 'Desconhecido'],
+                range=['skyblue', 'red', 'gray']
+            ),
+            legend=alt.Legend(title="Status de Fraude")
+        ),
+        tooltip=[
+            alt.Tooltip('timestamp:T', title='Data'),
+            alt.Tooltip('status:N', title='Status'),
+            alt.Tooltip('amount:Q', title='Valor', format=",.2f")
+        ]
+    ).properties(
+        width=700,
+        height=350,
+        title='Total Diário de Transações por Status de Fraude'
+    )
+
+    return chart
+
 # Cria um gráfico de colunas da taxa de fraude (%) por tipo de transação.
 def fraud_rate_by_transaction_type(df_filtered):
 
