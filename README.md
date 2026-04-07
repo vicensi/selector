@@ -9,6 +9,9 @@ A aplicação integra dados de clientes e transações em uma única visão, per
 
 Objetivo:  
   Monitorar o comportamento de transações.
+  
   Identificar padrões suspeitos e anomalias.
+  
   Detectar clientes de alto risco.
+  
   Apoiar decisões em investigações antifraude.
