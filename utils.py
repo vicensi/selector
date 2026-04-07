@@ -23,12 +23,31 @@ def load_data(transactions_path, customers_path):
 
 # FILTROS
 def apply_filters(df, date_range, selected_channels=None):
-    df_filtered = df[
-        (df['timestamp'] >= pd.to_datetime(date_range[0])) &
-        (df['timestamp'] <= pd.to_datetime(date_range[1]))
-    ]
 
-    if selected_channels is not None:
+    df = df.copy()
+
+    # Garantir datetime
+    df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+    df = df.dropna(subset=['timestamp'])
+
+    
+    # Ajuste correto de datas
+ 
+    if len(date_range) == 2:
+        start_date = pd.to_datetime(date_range[0])
+        end_date = pd.to_datetime(date_range[1]) + pd.Timedelta(days=1)
+
+        df_filtered = df[
+            (df['timestamp'] >= start_date) &
+            (df['timestamp'] < end_date)  # 👈 aqui está o fix
+        ]
+    else:
+        df_filtered = df
+
+   
+    # Filtro de canal
+    
+    if selected_channels:
         df_filtered = df_filtered[df_filtered['channel'].isin(selected_channels)]
 
     return df_filtered
