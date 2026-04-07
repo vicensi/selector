@@ -21,7 +21,7 @@ def load_data(transactions_path, customers_path):
 
     return df
 
-
+# FILTROS
 def apply_filters(df, date_range, selected_channels=None):
     df_filtered = df[
         (df['timestamp'] >= pd.to_datetime(date_range[0])) &
@@ -33,18 +33,17 @@ def apply_filters(df, date_range, selected_channels=None):
 
     return df_filtered
 
-
+# INDICADORES CABECALHO 
 def calculate_kpis(df_filtered):
     total_volume = len(df_filtered)
     total_amount = df_filtered['amount'].sum()
-   
     fraud_rate = ((df_filtered['fraud_confirmed'] == 1).sum() / total_volume)*100
 
     
 
     return total_volume, total_amount, fraud_rate
 
-# Tendência (comparação com período anterior)
+# TENDENCIA (comparação com período anterior)
 def calculate_trend(df, date_range, selected_channels=None):
     delta_days = (date_range[1] - date_range[0]).days
 
@@ -63,8 +62,9 @@ def calculate_trend(df, date_range, selected_channels=None):
 
     return prev_fraud_rate
 
-
+# TOP 10 CUSTOMER COM MAIOR RISK_SCORE
 def top_risk_barchart(df_filtered, top_n=10):
+    
     # Garantir tipo string na coluna customer_id
     df_filtered['customer_id'] = df_filtered['customer_id'].astype(str)
     
@@ -99,7 +99,7 @@ def top_risk_barchart(df_filtered, top_n=10):
         name='Média'
     )
     
-    # Altair não cria legenda automática para mark_rule, então usamos layer + text
+   
     # Criar um dataframe auxiliar para legenda
     media_df = top_risk[['customer_id']].copy()
     media_df['label'] = f"Média ({media_risco:.2f})"
@@ -113,13 +113,9 @@ def top_risk_barchart(df_filtered, top_n=10):
     chart = chart.properties(width=400, height=450)
     
     return chart
-
+# Cria um gráfico de colunas da taxa de fraude (%) por tipo de transação.
 def fraud_rate_by_transaction_type(df_filtered):
-    """
-    Cria um gráfico de colunas da taxa de fraude (%) por tipo de transação.
-    
-    df_filtered: dataframe mergeado (transactions + customers)
-    """
+
     # Garantir colunas corretas
     df_filtered['transaction_type'] = df_filtered['transaction_type'].astype(str)
 
@@ -154,13 +150,10 @@ def fraud_rate_by_transaction_type(df_filtered):
     )
 
     return chart
-
-def fraud_rate_by_merchant_category(df_filtered):
-    """
-    Cria um gráfico de colunas da taxa de fraude (%) por categoria de merchant.
     
-    df: dataframe mergeado (transactions + customers)
-    """
+# Cria um gráfico de colunas da taxa de fraude (%) por categoria de merchant.
+def fraud_rate_by_merchant_category(df_filtered):
+
     # Garantir colunas corretas
     df_filtered['merchant_category'] = df_filtered['merchant_category'].astype(str)
    
@@ -198,27 +191,15 @@ def fraud_rate_by_merchant_category(df_filtered):
 
     return chart
 
-
+# Gráfico de tendência: total de transações vs fraudes confirmadas por dia.
 def transaction_fraud_trend(df_filtered):
-    """
-    Gráfico de tendência: total de transações vs fraudes confirmadas por dia.
-    Inclui linha de média de fraudes no período.
-    
-    df: dataframe mergeado (transactions + customers)
-    """
 
-    # =========================
-    # 📅 Preparação de data
-    # =========================
+    # Preparação de data
     df_filtered['timestamp'] = pd.to_datetime(df_filtered['timestamp'], errors='coerce')
     df_filtered = df_filtered.dropna(subset=['timestamp'])
-
     df_filtered['data_so'] = df_filtered['timestamp'].dt.date
     
-
-    # =========================
-    # 📊 Agregação
-    # =========================
+    # Agregação
     trend_data = df_filtered.groupby('data_so').agg(
         total_transacoes=('transaction_id', 'count'),
         fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum())
@@ -226,14 +207,12 @@ def transaction_fraud_trend(df_filtered):
 
     trend_data = trend_data.sort_values('data_so')
 
-    # =========================
-    # 📉 Média de fraude
-    # =========================
+
+    # Média de fraude
     media_fraude = trend_data['fraudes_confirmadas'].mean()
 
-    # =========================
-    # 🔄 Transformar para formato longo (Altair)
-    # =========================
+
+    # Transformar para formato longo (Altair)
     trend_long = trend_data.melt(
         id_vars='data_so',
         value_vars=['total_transacoes', 'fraudes_confirmadas'],
@@ -241,9 +220,8 @@ def transaction_fraud_trend(df_filtered):
         value_name='quantidade'
     )
 
-    # =========================
-    # 📈 Linhas principais
-    # =========================
+    # Linhas principais
+
     lines = alt.Chart(trend_long).mark_line(point=True).encode(
         x=alt.X('data_so:T', title='Data'),
         y=alt.Y('quantidade:Q', title='Quantidade'),
@@ -262,9 +240,9 @@ def transaction_fraud_trend(df_filtered):
         ]
     )
 
-    # =========================
-    # 📏 Linha de média
-    # =========================
+
+    # Linha de média
+
     media_df = pd.DataFrame({
         'y': [media_fraude],
         'label': [f"Média Fraudes ({media_fraude:.2f})"]
@@ -278,9 +256,8 @@ def transaction_fraud_trend(df_filtered):
         tooltip=alt.Tooltip('y:Q', title='Média Fraudes', format=".2f")
     )
 
-    # =========================
-    # 📊 Combinar tudo
-    # =========================
+
+    # Combinar tudo
     chart = (lines + mean_line).properties(
         width=700,
         height=350,
@@ -289,27 +266,17 @@ def transaction_fraud_trend(df_filtered):
 
     return chart
 
-
+# Gráfico de tendência da taxa de fraude (%) por dia.
 def fraud_rate_trend(df_filtered):
-    """
-    Gráfico de tendência da taxa de fraude (%) por dia.
-    Inclui linha de média do período.
-    
-    df: dataframe mergeado (transactions + customers)
-    """
 
-    # =========================
-    # 📅 Preparação
-    # =========================
+    # Preparação
     df_filtered['timestamp'] = pd.to_datetime(df_filtered['timestamp'], errors='coerce')
     df_filtered = df_filtered.dropna(subset=['timestamp'])
-
     df_filtered['data_so'] = df_filtered['timestamp'].dt.date
    
 
-    # =========================
-    # 📊 Agregação
-    # =========================
+
+    # Agregação
     trend_data = df_filtered.groupby('data_so').agg(
         total_transacoes=('transaction_id', 'count'),
         fraudes_confirmadas=('fraud_confirmed', lambda x: (x == 1).sum())
@@ -322,14 +289,12 @@ def fraud_rate_trend(df_filtered):
 
     trend_data = trend_data.sort_values('data_so')
 
-    # =========================
-    # 📉 Média
-    # =========================
+
+    # Média
     media_taxa = trend_data['taxa_fraude_%'].mean()
 
-    # =========================
-    # 📈 Linha principal
-    # =========================
+
+    # Linha principal
     line = alt.Chart(trend_data).mark_line(point=True).encode(
         x=alt.X('data_so:T', title='Data'),
         y=alt.Y('taxa_fraude_%:Q', title='Taxa de Fraude (%)'),
@@ -342,9 +307,7 @@ def fraud_rate_trend(df_filtered):
         ]
     )
 
-    # =========================
-    # 📏 Linha da média
-    # =========================
+    # Linha da média
     media_df = pd.DataFrame({
         'y': [media_taxa]
     })
@@ -357,9 +320,8 @@ def fraud_rate_trend(df_filtered):
         tooltip=alt.Tooltip('y:Q', title='Média (%)', format=".2f")
     )
 
-    # =========================
-    # 📊 Combinar
-    # =========================
+
+    # Combinar
     chart = (line + mean_line).properties(
         width=700,
         height=350,
