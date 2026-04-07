@@ -76,7 +76,7 @@ def top_risk_barchart(df_filtered, top_n=10):
     
     # Cores: vermelho se já houve fraude, azul caso contrário
     top_risk['color'] = top_risk['customer_id'].apply(
-        lambda x: 'orange' if x in clientes_com_fraude else 'skyblue'
+        lambda x: 'lightcoral' if x in clientes_com_fraude else 'skyblue'
     )
     # Média do risk_score
     media_risco = df_filtered['risk_score'].mean()
