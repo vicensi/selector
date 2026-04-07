@@ -3,10 +3,10 @@ from utils import (
     load_data,
     apply_filters,
     calculate_kpis,
-    calculate_trend,
     top_risk_barchart,
     fraud_rate_by_transaction_type,
     fraud_rate_by_merchant_category,
+    top_risk_transaction_count,
     transaction_fraud_trend,
     fraud_rate_trend,
     fraud_by_channel
@@ -16,9 +16,9 @@ st.set_page_config(layout="wide")
 
 st.title("📊 Dashboard Antifraude")
 
-
-#  CACHE
-
+# =========================
+# 📦 CACHE
+# =========================
 @st.cache_data
 def get_data():
     return load_data(
@@ -28,9 +28,9 @@ def get_data():
 
 df = get_data()
 
-
-#  FILTROS
-
+# =========================
+# 🔎 FILTROS
+# =========================
 st.subheader("🔎 Filtros")
 
 col1, col2 = st.columns(2)
@@ -53,19 +53,18 @@ with col2:
         st.warning("Coluna 'device' não encontrada")
         selected_devices = None
 
-
-# PROCESSAMENTO
-
+# =========================
+# 📊 PROCESSAMENTO
+# =========================
 df_filtered = apply_filters(df, date_range, selected_devices)
 
 total_volume, total_amount, fraud_rate = calculate_kpis(df_filtered)
 
-prev_fraud_rate = calculate_trend(df, date_range, selected_devices)
 
 
-
-#  KPIs
-
+# =========================
+# 📊 KPIs
+# =========================
 col1, col2, col3 = st.columns(3)
 
 col1.metric("🔢 Volume Total", f"{total_volume:,}")
@@ -76,25 +75,34 @@ col3.metric("🚨 Taxa de Fraude", f"{fraud_rate:.2f}%")
 
 st.divider()
 
+# =========================
+# 📈 SÉRIE TEMPORAL
+# =========================
 
-# SÉRIE TEMPORAL
 
-st.subheader("📊 Ranking de Clientes de Alto Risco")
 
-if total_volume > 0:
-    chart = top_risk_barchart(df)
+col_graph0, col_graph01 = st.columns(2)
+
+with col_graph0:
+    st.subheader("📊 Ranking de Clientes de Alto Risco")
+    chart = top_risk_barchart(df_filtered)
     st.altair_chart(chart)
-else:
-    st.warning("Sem dados para os filtros selecionados.")
+  
+with col_graph01:
+    st.subheader("🚨 Top Clientes: Risco vs Número de Transações")
+    chart = top_risk_transaction_count(df)
+    st.altair_chart(chart)    
 
+col_graph02, col_graph002 = st.columns(2) 
 
-st.subheader("📈 Tendência de Transações vs Fraudes")
-chart = transaction_fraud_trend(df)
-st.altair_chart(chart)    
-
-st.subheader("🚨 Taxa de Fraude (%) ao Longo do Tempo")
-chart = fraud_rate_trend(df)
-st.altair_chart(chart)
+with col_graph02:
+    st.subheader("📈 Tendência de Transações vs Fraudes")
+    chart = transaction_fraud_trend(df_filtered)
+    st.altair_chart(chart)    
+with col_graph002:
+    st.subheader("🚨 Taxa de Fraude (%) ao Longo do Tempo")
+    chart = fraud_rate_trend(df_filtered)
+    st.altair_chart(chart)
 
 
 # Divisão em abas para não poluir a tela
@@ -104,11 +112,11 @@ with tab1:
     col_graph1, col_graph2 = st.columns(2)
     with col_graph1:
         st.title("🚨 Taxa de Fraude por Tipo de Transação")
-        chart = fraud_rate_by_transaction_type(df)
+        chart = fraud_rate_by_transaction_type(df_filtered)
         st.altair_chart(chart)
     with col_graph2:
         st.title("🚨 Taxa de Fraude por Categoria de Merchant")
-        chart = fraud_rate_by_merchant_category(df)
+        chart = fraud_rate_by_merchant_category(df_filtered)
         st.altair_chart(chart) 
 
 
