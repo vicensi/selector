@@ -16,9 +16,9 @@ st.set_page_config(layout="wide")
 
 st.title("📊 Dashboard Antifraude")
 
-# =========================
-# 📦 CACHE
-# =========================
+
+#  CACHE
+
 @st.cache_data
 def get_data():
     return load_data(
@@ -28,9 +28,9 @@ def get_data():
 
 df = get_data()
 
-# =========================
-# 🔎 FILTROS
-# =========================
+
+#  FILTROS
+
 st.subheader("🔎 Filtros")
 
 col1, col2 = st.columns(2)
@@ -53,9 +53,9 @@ with col2:
         st.warning("Coluna 'device' não encontrada")
         selected_devices = None
 
-# =========================
-# 📊 PROCESSAMENTO
-# =========================
+
+# PROCESSAMENTO
+
 df_filtered = apply_filters(df, date_range, selected_devices)
 
 total_volume, total_amount, fraud_rate = calculate_kpis(df_filtered)
@@ -63,9 +63,9 @@ total_volume, total_amount, fraud_rate = calculate_kpis(df_filtered)
 prev_fraud_rate = calculate_trend(df, date_range, selected_devices)
 
 
-# =========================
-# 📊 KPIs
-# =========================
+
+#  KPIs
+
 col1, col2, col3 = st.columns(3)
 
 col1.metric("🔢 Volume Total", f"{total_volume:,}")
@@ -76,9 +76,9 @@ col3.metric("🚨 Taxa de Fraude", f"{fraud_rate:.2f}%")
 
 st.divider()
 
-# =========================
-# 📈 SÉRIE TEMPORAL
-# =========================
+
+# SÉRIE TEMPORAL
+
 st.subheader("📊 Ranking de Clientes de Alto Risco")
 
 if total_volume > 0:
