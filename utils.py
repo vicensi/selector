@@ -122,7 +122,7 @@ def fraud_rate_by_transaction_type(df_filtered):
     """
     # Garantir colunas corretas
     df_filtered['transaction_type'] = df_filtered['transaction_type'].astype(str)
-    df_filtered['fraud_confirmed'] = df_filtered['fraud_confirmed'].fillna(0)
+
 
     # Calcular total de transações e fraudes por tipo
     fraud_by_type = df_filtered.groupby('transaction_type').agg(
@@ -163,7 +163,7 @@ def fraud_rate_by_merchant_category(df_filtered):
     """
     # Garantir colunas corretas
     df_filtered['merchant_category'] = df_filtered['merchant_category'].astype(str)
-    df_filtered['fraud_confirmed'] = df_filtered['fraud_confirmed'].fillna(0)
+   
 
     # Calcular total de transações e fraudes por categoria
     fraud_by_category = df_filtered.groupby('merchant_category').agg(
@@ -214,7 +214,7 @@ def transaction_fraud_trend(df_filtered):
     df_filtered = df_filtered.dropna(subset=['timestamp'])
 
     df_filtered['data_so'] = df_filtered['timestamp'].dt.date
-    df_filtered['fraud_confirmed'] = df_filtered['fraud_confirmed'].fillna(0)
+    
 
     # =========================
     # 📊 Agregação
@@ -305,7 +305,7 @@ def fraud_rate_trend(df_filtered):
     df_filtered = df_filtered.dropna(subset=['timestamp'])
 
     df_filtered['data_so'] = df_filtered['timestamp'].dt.date
-    df_filtered['fraud_confirmed'] = df_filtered['fraud_confirmed'].fillna(0)
+   
 
     # =========================
     # 📊 Agregação
