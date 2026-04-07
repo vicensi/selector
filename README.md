@@ -8,7 +8,7 @@ Este projeto consiste em um dashboard interativo de monitoramento antifraude, de
 A aplicação integra dados de clientes e transações em uma única visão, permitindo análises rápidas através de KPIs, gráficos interativos e filtros dinâmicos.
 
 Objetivo:  
-Monitorar o comportamento de transações
-Identificar padrões suspeitos e anomalias
-Detectar clientes de alto risco
-Apoiar decisões em investigações antifraude
+  Monitorar o comportamento de transações.
+  Identificar padrões suspeitos e anomalias.
+  Detectar clientes de alto risco.
+  Apoiar decisões em investigações antifraude.
