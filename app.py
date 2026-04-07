@@ -75,11 +75,22 @@ col3.metric("🚨 Taxa de Fraude", f"{fraud_rate:.2f}%")
 
 st.divider()
 
-# =========================
-# 📈 SÉRIE TEMPORAL
-# =========================
+
+# SÉRIE TEMPORAL
+
+col_graph02, col_graph002 = st.columns(2) 
+
+with col_graph02:
+    st.subheader("📈 Tendência de Transações vs Fraudes")
+    chart = transaction_fraud_trend(df_filtered)
+    st.altair_chart(chart)    
+with col_graph002:
+    st.subheader("🚨 Taxa de Fraude (%) ao Longo do Tempo")
+    chart = fraud_rate_trend(df_filtered)
+    st.altair_chart(chart)
 
 
+# RISCO
 
 col_graph0, col_graph01 = st.columns(2)
 
