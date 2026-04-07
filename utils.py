@@ -150,6 +150,89 @@ def fraud_rate_by_transaction_type(df_filtered):
     )
 
     return chart
+
+
+# Gráfico horizontal mostrando número de transações para os clientes com maior risk_score.    
+def top_risk_transaction_count(df_filtered, top_n=10):
+
+    df_filtered = df_filtered.copy()
+
+    # =========================
+    # 🔝 Top clientes por risco
+    # =========================
+    df_filtered['customer_id'] = df_filtered['customer_id'].astype(str)
+
+    top_customers = (
+        df_filtered[['customer_id', 'risk_score']]
+        .drop_duplicates()
+        .nlargest(top_n, 'risk_score')
+    )
+
+    top_ids = top_customers['customer_id'].tolist()
+
+    # =========================
+    # 🚨 Clientes com fraude
+    # =========================
+    clientes_com_fraude = set(
+        df_filtered[df_filtered['fraud_confirmed'] == 1]['customer_id'].astype(str)
+    )
+
+    # =========================
+    # 📊 Contagem de transações
+    # =========================
+    transaction_counts = (
+        df_filtered[df_filtered['customer_id'].isin(top_ids)]
+        .groupby('customer_id')
+        .size()
+        .reset_index(name='transaction_count')
+    )
+
+    # =========================
+    # 🔗 Merge com risk_score
+    # =========================
+    final_df = transaction_counts.merge(
+        top_customers,
+        on='customer_id',
+        how='left'
+    )
+
+    # =========================
+    # 🎯 Categoria (para legenda)
+    # =========================
+    final_df['status'] = final_df['customer_id'].apply(
+        lambda x: 'Com Fraude' if x in clientes_com_fraude else 'Sem Fraude'
+    )
+
+    # Ordenar por risk_score
+    final_df = final_df.sort_values(by='risk_score', ascending=False)
+
+    # =========================
+    # 📊 Gráfico horizontal
+    # =========================
+    chart = alt.Chart(final_df).mark_bar().encode(
+        y=alt.Y('customer_id:N', sort='-x', title='Customer ID'),
+        x=alt.X('transaction_count:Q', title='Número de Transações'),
+        color=alt.Color(
+            'status:N',
+            scale=alt.Scale(
+                domain=['Com Fraude', 'Sem Fraude'],
+                range=['lightcoral', 'skyblue']
+            ),
+            legend=alt.Legend(title="Status do Cliente")
+        ),
+        tooltip=[
+            alt.Tooltip('customer_id', title='Customer ID'),
+            alt.Tooltip('transaction_count', title='Transações'),
+            alt.Tooltip('risk_score', title='Risk Score'),
+            alt.Tooltip('status', title='Status')
+        ]
+    ).properties(
+        width=600,
+        height=400,
+        title='Top Clientes por Risk Score vs Número de Transações'
+    )
+
+    return chart
     
 # Cria um gráfico de colunas da taxa de fraude (%) por categoria de merchant.
 def fraud_rate_by_merchant_category(df_filtered):
