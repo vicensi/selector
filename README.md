@@ -2,6 +2,8 @@
 Analista de Dados / BI
 Desafio: Monitoramento de Antifraude no Mercado Financeiro
 
+Dashboard: https://selector-epbvchyexczbsm9g46xa7b.streamlit.app
+
 Este projeto consiste em um dashboard interativo de monitoramento antifraude, desenvolvido com Python e Streamlit, com o objetivo de auxiliar times de risco na análise, detecção e acompanhamento de transações suspeitas.
 A aplicação integra dados de clientes e transações em uma única visão, permitindo análises rápidas através de KPIs, gráficos interativos e filtros dinâmicos.
 
